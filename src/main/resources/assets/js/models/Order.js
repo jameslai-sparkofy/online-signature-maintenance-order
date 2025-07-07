@@ -2,8 +2,9 @@
 
 class Order {
     constructor(data = {}) {
-        this.orderNumber = data.orderNumber || generateOrderNumber();
-        this.date = data.date || formatDate(new Date());
+        // 使用安全的初始化，避免在載入時立即呼叫可能未定義的函數
+        this.orderNumber = data.orderNumber || this._generateOrderNumber();
+        this.date = data.date || this._formatDate(new Date());
         this.site = data.site || '';
         this.building = data.building || '';
         this.floor = data.floor || '';
@@ -17,7 +18,44 @@ class Order {
         this.customerEmail = data.customerEmail || '';
         this.createdAt = data.createdAt || new Date().toISOString();
         this.signedAt = data.signedAt || null;
-        this.link = data.link || generateOrderLink(this.orderNumber);
+        this.link = data.link || this._generateOrderLink(this.orderNumber);
+    }
+    
+    /**
+     * 安全的訂單號生成（避免依賴外部函數）
+     */
+    _generateOrderNumber() {
+        if (typeof generateOrderNumber === 'function') {
+            return generateOrderNumber();
+        }
+        // fallback 實現
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+        const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        return `${dateStr}-${randomNum}`;
+    }
+    
+    /**
+     * 安全的日期格式化（避免依賴外部函數）
+     */
+    _formatDate(date) {
+        if (typeof formatDate === 'function') {
+            return formatDate(date);
+        }
+        // fallback 實現
+        return date.toISOString().slice(0, 10);
+    }
+    
+    /**
+     * 安全的連結生成（避免依賴外部函數）
+     */
+    _generateOrderLink(orderNumber) {
+        if (typeof generateOrderLink === 'function') {
+            return generateOrderLink(orderNumber);
+        }
+        // fallback 實現
+        const baseUrl = window.location.origin + window.location.pathname.replace('/index.html', '').replace(/\/$/, '');
+        return `${baseUrl}/signature.html?order=${orderNumber}`;
     }
 
     /**
@@ -82,7 +120,16 @@ class Order {
      * @returns {string}
      */
     getFormattedAmount() {
-        return formatCurrency(this.amount);
+        if (typeof formatCurrency === 'function') {
+            return formatCurrency(this.amount);
+        }
+        // fallback 實現
+        return new Intl.NumberFormat('zh-TW', {
+            style: 'currency',
+            currency: 'TWD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(this.amount);
     }
 
     /**
