@@ -164,14 +164,31 @@
         </div>
     </div>
 
-    <script src="js/utils/helpers.js"></script>
-    <script src="js/models/Order.js"></script>
-    <script src="js/services/OrderService.js"></script>
-    <script src="js/services/StorageService.js"></script>
-    <script src="js/core/SignatureHandler.js"></script>
-    <script src="js/core/PhotoHandler.js"></script>
-    <script src="js/core/FormHandler.js"></script>
-    <script src="js/core/AppController.js"></script>
-    <script src="js/core/app.js"></script>
+    <!-- 載入狀態檢查 -->
+    <script>
+        console.log('🔧 開始載入 JavaScript 檔案...');
+        window.loadedScripts = [];
+        window.scriptLoadErrors = [];
+        
+        function checkScriptLoad(scriptName) {
+            window.loadedScripts.push(scriptName);
+            console.log(`✅ ${scriptName} 載入完成`);
+        }
+        
+        function handleScriptError(scriptName, error) {
+            window.scriptLoadErrors.push({script: scriptName, error: error});
+            console.error(`❌ ${scriptName} 載入失敗:`, error);
+        }
+    </script>
+    
+    <script src="js/utils/helpers.js" onload="checkScriptLoad('helpers.js')" onerror="handleScriptError('helpers.js', event)"></script>
+    <script src="js/models/Order.js" onload="checkScriptLoad('Order.js')" onerror="handleScriptError('Order.js', event)"></script>
+    <script src="js/services/StorageService.js" onload="checkScriptLoad('StorageService.js')" onerror="handleScriptError('StorageService.js', event)"></script>
+    <script src="js/services/OrderService.js" onload="checkScriptLoad('OrderService.js')" onerror="handleScriptError('OrderService.js', event)"></script>
+    <script src="js/core/SignatureHandler.js" onload="checkScriptLoad('SignatureHandler.js')" onerror="handleScriptError('SignatureHandler.js', event)"></script>
+    <script src="js/core/PhotoHandler.js" onload="checkScriptLoad('PhotoHandler.js')" onerror="handleScriptError('PhotoHandler.js', event)"></script>
+    <script src="js/core/FormHandler.js" onload="checkScriptLoad('FormHandler.js')" onerror="handleScriptError('FormHandler.js', event)"></script>
+    <script src="js/core/AppController.js" onload="checkScriptLoad('AppController.js')" onerror="handleScriptError('AppController.js', event)"></script>
+    <script src="js/core/app.js" onload="checkScriptLoad('app.js')" onerror="handleScriptError('app.js', event)"></script>
 </body>
 </html>

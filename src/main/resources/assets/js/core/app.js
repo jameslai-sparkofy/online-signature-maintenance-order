@@ -66,35 +66,58 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ 再次確認彈窗已隱藏');
     }
     
-    // 等待一小段時間確保所有腳本都載入
-    setTimeout(() => {
-        try {
-            console.log('🔧 檢查必要的類別是否存在...');
+    // 等待較長時間確保所有腳本都載入，並使用重試機制
+    const initializeApp = (attempt = 1, maxAttempts = 5) => {
+        console.log(`🔧 第 ${attempt} 次嘗試檢查必要的類別...`);
+        
+        // 檢查腳本載入狀態
+        if (window.loadedScripts) {
+            console.log('📝 已載入的腳本:', window.loadedScripts);
+        }
+        if (window.scriptLoadErrors && window.scriptLoadErrors.length > 0) {
+            console.error('💥 腳本載入錯誤:', window.scriptLoadErrors);
+        }
+        
+        // 檢查必要的類別
+        const requiredClasses = [
+            'AppController',
+            'OrderService', 
+            'StorageService',
+            'FormHandler'
+        ];
+        
+        const missingClasses = [];
+        requiredClasses.forEach(className => {
+            if (typeof window[className] === 'undefined') {
+                missingClasses.push(className);
+                console.warn(`⚠️ 類別尚未載入: ${className}`);
+            }
+        });
+        
+        if (missingClasses.length > 0 && attempt < maxAttempts) {
+            console.log(`⏳ 第 ${attempt} 次檢查失敗，${500 * attempt}ms 後重試...`);
+            setTimeout(() => initializeApp(attempt + 1, maxAttempts), 500 * attempt);
+            return;
+        }
+        
+        if (missingClasses.length > 0) {
+            console.error(`💥 經過 ${maxAttempts} 次嘗試仍無法載入類別: ${missingClasses.join(', ')}`);
             
-            // 檢查必要的類別
-            const requiredClasses = [
-                'AppController',
-                'OrderService', 
-                'StorageService',
-                'FormHandler'
-            ];
-            
-            const missingClasses = [];
-            requiredClasses.forEach(className => {
-                if (typeof window[className] === 'undefined') {
-                    missingClasses.push(className);
-                    console.error(`❌ 缺少類別: ${className}`);
-                }
-            });
-            
-            if (missingClasses.length > 0) {
-                console.error(`💥 無法初始化，缺少類別: ${missingClasses.join(', ')}`);
-                alert(`系統載入失敗，缺少必要組件: ${missingClasses.join(', ')}`);
+            // 嘗試簡化初始化
+            console.log('🔄 嘗試簡化初始化...');
+            try {
+                initializeSimpleApp();
+                return;
+            } catch (error) {
+                console.error('💥 簡化初始化也失敗:', error);
+                alert(`系統載入失敗，請重新整理頁面。\n缺少組件: ${missingClasses.join(', ')}`);
                 return;
             }
+        }
+        
+        console.log('✅ 所有必要類別都已載入');
             
-            console.log('✅ 所有必要類別都已載入');
-            
+        try {
             // 初始化應用程式
             const app = new AppController();
             window.app = app; // 存到全域供除錯使用
@@ -129,7 +152,42 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('💥 初始化過程發生錯誤:', error);
             alert(`系統初始化失敗: ${error.message}`);
         }
-    }, 100);
+    };
+    
+    // 開始初始化
+    setTimeout(() => initializeApp(), 200);
+});
+
+// 簡化初始化函數（當主要類別無法載入時使用）
+function initializeSimpleApp() {
+    console.log('🔧 啟動簡化模式...');
+    
+    // 設定基本的按鈕事件
+    const addStaffBtn = document.getElementById('addStaffBtn');
+    if (addStaffBtn) {
+        addStaffBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('請重新整理頁面，系統尚未完全載入');
+        });
+    }
+    
+    // 設定表單提交
+    const mainForm = document.getElementById('maintenanceForm');
+    if (mainForm) {
+        mainForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('請重新整理頁面，系統尚未完全載入');
+        });
+    }
+    
+    // 顯示系統狀態
+    const header = document.querySelector('.header h1');
+    if (header) {
+        header.textContent += ' (簡化模式)';
+        header.style.color = '#dc2626';
+    }
+    
+    console.log('⚠️ 簡化模式啟動完成');
 });
 
 // 全域錯誤處理
