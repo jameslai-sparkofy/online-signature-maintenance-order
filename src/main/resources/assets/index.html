@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>線上簽名維修單系統</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>線上簽名維修單系統</h1>
+            <nav class="nav">
+                <button id="newOrderBtn" class="btn btn-primary">新增維修單</button>
+                <button id="orderListBtn" class="btn btn-secondary">維修單列表</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <!-- 新增維修單表單 -->
+            <section id="newOrderForm" class="section">
+                <h2>新增維修單</h2>
+                <form id="maintenanceForm" class="form">
+                    <div class="form-group">
+                        <label for="orderNumber">維修單號</label>
+                        <input type="text" id="orderNumber" name="orderNumber" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date">日期</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="site">案場</label>
+                        <input type="text" id="site" name="site" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="building">棟別</label>
+                            <input type="text" id="building" name="building" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="floor">樓層</label>
+                            <input type="text" id="floor" name="floor" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="unit">戶別</label>
+                            <input type="text" id="unit" name="unit" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reason">維修原因</label>
+                        <textarea id="reason" name="reason" rows="4" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="staff">工務人員</label>
+                        <select id="staff" name="staff" required>
+                            <option value="">請選擇工務人員</option>
+                        </select>
+                        <button type="button" id="addStaffBtn" class="btn btn-small">新增人員</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="amount">金額</label>
+                        <input type="number" id="amount" name="amount" min="0" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photos">照片上傳</label>
+                        <input type="file" id="photos" name="photos" multiple accept="image/*">
+                        <div id="photoPreview" class="photo-preview"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">建立維修單</button>
+                        <button type="reset" class="btn btn-secondary">清除重填</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 維修單列表 -->
+            <section id="orderList" class="section hidden">
+                <h2>維修單列表</h2>
+                <div class="filters">
+                    <input type="text" id="siteFilter" placeholder="篩選案場">
+                    <input type="text" id="buildingFilter" placeholder="篩選棟別">
+                    <select id="statusFilter">
+                        <option value="">全部狀態</option>
+                        <option value="pending">待簽名</option>
+                        <option value="signed">已簽名</option>
+                    </select>
+                </div>
+                <div id="orderTable" class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>維修單號</th>
+                                <th>日期</th>
+                                <th>案場</th>
+                                <th>棟別/樓層/戶別</th>
+                                <th>工務人員</th>
+                                <th>金額</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderTableBody">
+                            <!-- Orders will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 簽名頁面 -->
+            <section id="signaturePage" class="section hidden">
+                <h2>維修單簽名確認</h2>
+                <div id="orderDetails" class="order-details">
+                    <!-- Order details will be populated here -->
+                </div>
+                <div class="signature-section">
+                    <h3>數位簽名</h3>
+                    <canvas id="signatureCanvas" class="signature-canvas"></canvas>
+                    <div class="signature-controls">
+                        <button id="clearSignatureBtn" class="btn btn-secondary">清除</button>
+                        <button id="signOrderBtn" class="btn btn-primary">確認簽名</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="customerEmail">Email (選填)</label>
+                    <input type="email" id="customerEmail" name="customerEmail" placeholder="簽名後將寄送確認信">
+                </div>
+            </section>
+        </main>
+
+        <!-- 新增工務人員彈窗 -->
+        <div id="addStaffModal" class="modal hidden">
+            <div class="modal-content">
+                <h3>新增工務人員</h3>
+                <form id="addStaffForm">
+                    <div class="form-group">
+                        <label for="staffName">姓名</label>
+                        <input type="text" id="staffName" name="staffName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="staffPhone">電話</label>
+                        <input type="tel" id="staffPhone" name="staffPhone">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">新增</button>
+                        <button type="button" id="cancelAddStaffBtn" class="btn btn-secondary">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 訊息提示 -->
+        <div id="messageToast" class="toast hidden">
+            <span id="messageText"></span>
+            <button id="closeToastBtn" class="toast-close">&times;</button>
+        </div>
+    </div>
+
+    <script src="../js/utils/helpers.js"></script>
+    <script src="../js/models/Order.js"></script>
+    <script src="../js/services/OrderService.js"></script>
+    <script src="../js/services/StorageService.js"></script>
+    <script src="../js/core/SignatureHandler.js"></script>
+    <script src="../js/core/PhotoHandler.js"></script>
+    <script src="../js/core/FormHandler.js"></script>
+    <script src="../js/core/AppController.js"></script>
+    <script src="../js/core/app.js"></script>
+</body>
+</html>
