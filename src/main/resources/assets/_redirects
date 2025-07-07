@@ -1,0 +1,9 @@
+# Redirect rules for Single Page Application
+/*    /index.html   200
+
+# Signature page handling
+/signature/*    /signature.html   200
+/sign/*         /signature.html   200
+
+# API endpoints (if needed in future)
+/api/*          /index.html       404

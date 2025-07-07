@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: online-signature-maintenance-order
+    env: static
+    buildCommand: npm install
+    staticPublishPath: ./src/main/resources/assets
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
