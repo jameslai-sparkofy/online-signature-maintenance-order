@@ -96,7 +96,22 @@ body {
 }
 
 .hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* 確保彈窗預設隱藏 */
+#addStaffModal {
     display: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+#addStaffModal.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 /* Forms */

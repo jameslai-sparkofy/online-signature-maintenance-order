@@ -328,9 +328,25 @@ class FormHandler {
      * Show add staff modal
      */
     showAddStaffModal() {
+        console.log('📦 顯示新增工務人員彈窗');
         const modal = document.getElementById('addStaffModal');
         if (modal) {
+            // 移除所有隱藏樣式
             modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+            
+            // 聚焦到姓名欄位
+            const nameInput = document.getElementById('staffName');
+            if (nameInput) {
+                setTimeout(() => nameInput.focus(), 100);
+            }
+            
+            console.log('✅ 彈窗已顯示');
+        } else {
+            console.error('❌ 找不到新增工務人員彈窗');
+            alert('系統錯誤：找不到新增人員彈窗');
         }
     }
 
@@ -338,9 +354,14 @@ class FormHandler {
      * Hide add staff modal
      */
     hideAddStaffModal() {
+        console.log('📦 隱藏新增工務人員彈窗');
         const modal = document.getElementById('addStaffModal');
         if (modal) {
+            // 確保完全隱藏
             modal.classList.add('hidden');
+            modal.style.display = 'none';
+            modal.style.visibility = 'hidden';
+            modal.style.opacity = '0';
         }
         
         // Clear form
