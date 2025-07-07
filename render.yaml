@@ -2,4 +2,4 @@ services:
   - type: web
     name: online-signature-maintenance-order
     env: static
-    staticPublishPath: ./
+    staticPublishPath: ./src/main/resources/assets
