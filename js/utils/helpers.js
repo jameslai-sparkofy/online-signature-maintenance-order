@@ -6,7 +6,10 @@
  */
 function generateOrderNumber() {
     const now = new Date();
-    const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const dateStr = `${year}${month}${day}`;
     const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
     return `${dateStr}-${randomNum}`;
 }
@@ -17,7 +20,10 @@ function generateOrderNumber() {
  * @returns {string}
  */
 function formatDate(date) {
-    return date.toISOString().slice(0, 10);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 /**

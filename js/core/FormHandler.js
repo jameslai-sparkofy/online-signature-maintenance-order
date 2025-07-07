@@ -31,13 +31,22 @@ class FormHandler {
         // Set default date to today
         const dateInput = document.getElementById('date');
         if (dateInput) {
-            dateInput.value = formatDate(new Date());
+            const today = new Date();
+            const formattedDate = today.getFullYear() + '-' + 
+                                String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                                String(today.getDate()).padStart(2, '0');
+            dateInput.value = formattedDate;
         }
         
         // Generate and set order number
         const orderNumberInput = document.getElementById('orderNumber');
         if (orderNumberInput) {
-            orderNumberInput.value = generateOrderNumber();
+            const now = new Date();
+            const dateStr = now.getFullYear() + 
+                          String(now.getMonth() + 1).padStart(2, '0') + 
+                          String(now.getDate()).padStart(2, '0');
+            const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            orderNumberInput.value = `${dateStr}-${randomNum}`;
         }
     }
 
