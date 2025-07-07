@@ -356,45 +356,73 @@ class FormHandler {
      */
     async handleAddStaff(e) {
         e.preventDefault();
+        console.log('🔧 開始處理工務人員新增 - comprehensive debugging');
         
         try {
             const formData = new FormData(e.target);
-            const staffData = {
-                name: formData.get('staffName').trim(),
-                phone: formData.get('staffPhone').trim(),
-                addedAt: new Date().toISOString()
+            const staffName = formData.get('staffName');
+            const staffPhone = formData.get('staffPhone');
+            
+            console.log('📝 表單資料:', { staffName, staffPhone });
+            
+            // 驗證必填欄位
+            if (!staffName || !staffName.trim()) {
+                console.log('❌ 未提供姓名');
+                alert('請輸入姓名');
+                return;
+            }
+            
+            // 建立工務人員資料
+            const staff = {
+                name: staffName.trim(),
+                phone: staffPhone ? staffPhone.trim() : '',
+                createdAt: new Date().toISOString()
             };
             
-            // Validate
-            if (!staffData.name) {
-                showToast('請輸入姓名', 'error');
+            console.log('👥 建立工務人員:', staff);
+            
+            // 檢查是否重複
+            const storage = new StorageService();
+            const existingStaff = storage.getAllStaff();
+            const isDuplicate = existingStaff.some(existing => existing.name === staff.name);
+            
+            if (isDuplicate) {
+                alert(`工務人員 "${staff.name}" 已存在`);
                 return;
             }
             
-            // Check if already exists
-            const existingStaff = this.storageService.getAllStaff();
-            if (existingStaff.some(staff => staff.name === staffData.name)) {
-                showToast('此工務人員已存在', 'error');
-                return;
-            }
+            // 保存到 localStorage
+            storage.saveStaff(staff);
+            console.log('💾 已保存到儲存空間');
             
-            // Save staff
-            this.storageService.saveStaff(staffData);
+            // 更新選項列表
+            this.updateStaffOptions();
             
-            // Reload staff options
-            this.loadStaffOptions();
-            
-            // Select the new staff
+            // 自動選擇新建立的工務人員
             const staffSelect = document.getElementById('staff');
             if (staffSelect) {
-                staffSelect.value = staffData.name;
+                staffSelect.value = staff.name;
+                console.log('✅ 已自動選擇:', staff.name);
             }
             
-            showToast('工務人員新增成功', 'success');
+            // 關閉彈窗
             this.hideAddStaffModal();
             
+            // 清空表單
+            document.getElementById('addStaffForm').reset();
+            
+            // 顯示成功訊息
+            if (typeof showToast === 'function') {
+                showToast(`工務人員 ${staff.name} 新增成功`, 'success');
+            } else {
+                alert(`工務人員 ${staff.name} 新增成功`);
+            }
+            
+            console.log('✅ 工務人員新增流程完成');
+            
         } catch (error) {
-            showToast(`新增工務人員失敗: ${error.message}`, 'error');
+            console.error('💥 工務人員新增失敗:', error);
+            alert(`新增工務人員失敗: ${error.message}`);
         }
     }
 

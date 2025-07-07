@@ -592,3 +592,98 @@ class AppController {
         };
     }
 }
+    
+    setupEventListeners() {
+        console.log('🎧 設定事件監聽器 - comprehensive event setup');
+        
+        try {
+            // 新增工務人員按鈕
+            const addStaffBtn = document.getElementById('addStaffBtn');
+            if (addStaffBtn) {
+                addStaffBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('🖱️ 新增工務人員按鈕被點擊');
+                    if (this.formHandler && typeof this.formHandler.showAddStaffModal === 'function') {
+                        this.formHandler.showAddStaffModal();
+                    } else {
+                        console.error('❌ FormHandler 或 showAddStaffModal 方法不存在');
+                        alert('系統錯誤：無法開啟新增人員視窗');
+                    }
+                });
+                console.log('✅ 新增工務人員按鈕事件已設定');
+            } else {
+                console.warn('⚠️ 找不到新增工務人員按鈕');
+            }
+            
+            // 工務人員表單提交
+            const addStaffForm = document.getElementById('addStaffForm');
+            if (addStaffForm) {
+                addStaffForm.addEventListener('submit', (e) => {
+                    console.log('📝 工務人員表單提交');
+                    if (this.formHandler && typeof this.formHandler.handleAddStaff === 'function') {
+                        this.formHandler.handleAddStaff(e);
+                    } else {
+                        e.preventDefault();
+                        console.error('❌ FormHandler 或 handleAddStaff 方法不存在');
+                        alert('系統錯誤：無法處理表單提交');
+                    }
+                });
+                console.log('✅ 工務人員表單事件已設定');
+            } else {
+                console.warn('⚠️ 找不到工務人員表單');
+            }
+            
+            // 取消按鈕
+            const cancelBtn = document.getElementById('cancelAddStaffBtn');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('❌ 取消新增工務人員');
+                    if (this.formHandler && typeof this.formHandler.hideAddStaffModal === 'function') {
+                        this.formHandler.hideAddStaffModal();
+                    }
+                });
+                console.log('✅ 取消按鈕事件已設定');
+            }
+            
+            // Toast 關閉按鈕
+            const closeToastBtn = document.getElementById('closeToastBtn');
+            if (closeToastBtn) {
+                closeToastBtn.addEventListener('click', () => {
+                    if (typeof hideToast === 'function') {
+                        hideToast();
+                    }
+                });
+                console.log('✅ Toast 關閉按鈕事件已設定');
+            }
+            
+        } catch (error) {
+            console.error('💥 設定事件監聽器失敗:', error);
+        }
+    }
+    
+    initializeApplication() {
+        console.log('🚀 初始化應用程式');
+        
+        try {
+            // 初始化服務
+            this.orderService = new OrderService();
+            this.formHandler = new FormHandler();
+            
+            // 設定事件監聽器
+            this.setupEventListeners();
+            
+            // 載入工務人員選項
+            if (this.formHandler && typeof this.formHandler.updateStaffOptions === 'function') {
+                this.formHandler.updateStaffOptions();
+            }
+            
+            // 初始化表單
+            this.initializeForm();
+            
+            console.log('✅ 應用程式初始化完成');
+            
+        } catch (error) {
+            console.error('💥 應用程式初始化失敗:', error);
+        }
+    }

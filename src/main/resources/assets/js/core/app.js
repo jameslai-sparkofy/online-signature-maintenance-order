@@ -1,3 +1,70 @@
+
+// 強健的應用程式初始化 - robust initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM 載入完成，開始初始化');
+    
+    // 等待一小段時間確保所有腳本都載入
+    setTimeout(() => {
+        try {
+            console.log('🔧 檢查必要的類別是否存在...');
+            
+            // 檢查必要的類別
+            const requiredClasses = [
+                'AppController',
+                'OrderService', 
+                'StorageService',
+                'FormHandler'
+            ];
+            
+            const missingClasses = [];
+            requiredClasses.forEach(className => {
+                if (typeof window[className] === 'undefined') {
+                    missingClasses.push(className);
+                    console.error(`❌ 缺少類別: ${className}`);
+                }
+            });
+            
+            if (missingClasses.length > 0) {
+                console.error(`💥 無法初始化，缺少類別: ${missingClasses.join(', ')}`);
+                alert(`系統載入失敗，缺少必要組件: ${missingClasses.join(', ')}`);
+                return;
+            }
+            
+            console.log('✅ 所有必要類別都已載入');
+            
+            // 初始化應用程式
+            const app = new AppController();
+            
+            // 執行初始化
+            if (typeof app.initializeApplication === 'function') {
+                app.initializeApplication();
+            } else {
+                console.warn('⚠️ initializeApplication 方法不存在，使用基本初始化');
+                
+                // 基本初始化
+                if (typeof app.setupEventListeners === 'function') {
+                    app.setupEventListeners();
+                }
+                
+                if (app.formHandler && typeof app.formHandler.updateStaffOptions === 'function') {
+                    app.formHandler.updateStaffOptions();
+                }
+            }
+            
+            console.log('✅ 應用程式初始化完成');
+            
+            // 全域錯誤處理
+            window.addEventListener('error', (e) => {
+                console.error('💥 全域錯誤:', e.error);
+            });
+            
+        } catch (error) {
+            console.error('💥 初始化過程發生錯誤:', error);
+            alert(`系統初始化失敗: ${error.message}`);
+        }
+    }, 100);
+});
+
 // Main application entry point
 
 // Global app instance
