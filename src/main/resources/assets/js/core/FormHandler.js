@@ -51,11 +51,11 @@ class FormHandler {
         // Form reset
         this.form.addEventListener('reset', () => this.handleReset());
         
-        // Add staff button
-        const addStaffBtn = document.getElementById('addStaffBtn');
-        if (addStaffBtn) {
-            addStaffBtn.addEventListener('click', () => this.showAddStaffModal());
-        }
+        // Add staff button - 事件由 AppController 處理，避免重複綁定
+        // const addStaffBtn = document.getElementById('addStaffBtn');
+        // if (addStaffBtn) {
+        //     addStaffBtn.addEventListener('click', () => this.showAddStaffModal());
+        // }
         
         // Add staff form
         const addStaffForm = document.getElementById('addStaffForm');
@@ -539,5 +539,38 @@ class FormHandler {
         inputs.forEach(input => {
             input.addEventListener('input', autoSaveHandler);
         });
+    }
+    
+    /**
+     * 更新工務人員選項列表
+     */
+    updateStaffOptions() {
+        console.log('🔄 更新工務人員選項');
+        try {
+            const storage = new StorageService();
+            const staffMembers = storage.getAllStaff();
+            const staffSelect = document.getElementById('staff');
+            
+            if (!staffSelect) {
+                console.error('❌ 找不到工務人員選擇欄位');
+                return;
+            }
+            
+            // 清空現有選項（保留預設選項）
+            staffSelect.innerHTML = '<option value="">請選擇工務人員</option>';
+            
+            // 新增工務人員選項
+            staffMembers.forEach(staff => {
+                const option = document.createElement('option');
+                option.value = staff.name;
+                option.textContent = staff.name;
+                staffSelect.appendChild(option);
+            });
+            
+            console.log(`✅ 更新完成，共 ${staffMembers.length} 位工務人員`);
+            
+        } catch (error) {
+            console.error('💥 更新工務人員選項失敗:', error);
+        }
     }
 }

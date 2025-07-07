@@ -53,19 +53,33 @@ class AppController {
      * Initialize components
      */
     initializeComponents() {
+        console.log('🔧 初始化組件...');
+        
         // Check if we're in signature mode
         const orderNumber = getUrlParameter('order');
         if (orderNumber) {
+            console.log('📝 簽名模式 - 初始化 SignatureHandler');
             this.signatureHandler = new SignatureHandler();
         } else {
+            console.log('📋 表單模式 - 初始化 FormHandler');
             this.formHandler = new FormHandler();
         }
+        
+        console.log('✅ 組件初始化完成', {
+            formHandler: !!this.formHandler,
+            signatureHandler: !!this.signatureHandler
+        });
     }
 
     /**
      * Bind global events
      */
     bindEvents() {
+        console.log('🎧 綁定事件...');
+        
+        // 先設定主要的事件監聽器
+        this.setupEventListeners();
+        
         // Toast close button
         const closeToastBtn = document.getElementById('closeToastBtn');
         if (closeToastBtn) {
@@ -591,7 +605,6 @@ class AppController {
             storageStats: this.storageService.getStorageStats()
         };
     }
-}
     
     setupEventListeners() {
         console.log('🎧 設定事件監聽器 - comprehensive event setup');

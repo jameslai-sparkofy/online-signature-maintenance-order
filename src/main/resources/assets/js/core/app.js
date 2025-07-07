@@ -122,20 +122,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const app = new AppController();
             window.app = app; // 存到全域供除錯使用
             
-            // 執行初始化
-            if (typeof app.initializeApplication === 'function') {
-                app.initializeApplication();
-            } else {
-                console.warn('⚠️ initializeApplication 方法不存在，使用基本初始化');
+            // AppController 構造函數已經調用了 init()，包含所有必要的初始化
+            console.log('✅ AppController 初始化完成');
+            
+            // 檢查初始化是否成功
+            if (app.formHandler) {
+                console.log('✅ FormHandler 已初始化');
                 
-                // 基本初始化
-                if (typeof app.setupEventListeners === 'function') {
-                    app.setupEventListeners();
-                }
-                
-                if (app.formHandler && typeof app.formHandler.updateStaffOptions === 'function') {
+                // 載入工務人員選項
+                if (typeof app.formHandler.updateStaffOptions === 'function') {
                     app.formHandler.updateStaffOptions();
+                } else {
+                    console.warn('⚠️ updateStaffOptions 方法不存在');
                 }
+            } else {
+                console.log('ℹ️ FormHandler 未初始化（可能在簽名模式）');
             }
             
             console.log('✅ 線上簽名維修單系統初始化完成');
