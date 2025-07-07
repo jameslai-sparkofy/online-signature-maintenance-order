@@ -14,14 +14,20 @@ class FormHandler {
      * Initialize form handler
      */
     init() {
+        console.log('FormHandler.init() called');
         this.form = document.getElementById('maintenanceForm');
-        if (!this.form) return;
+        if (!this.form) {
+            console.error('MaintenanceForm not found!');
+            return;
+        }
         
+        console.log('Form found, initializing components...');
         this.photoHandler = new PhotoHandler();
         this.setupForm();
         this.bindEvents();
         this.loadStaffOptions();
         this.loadPreviousValues();
+        console.log('FormHandler initialization complete');
     }
 
     /**
@@ -54,6 +60,8 @@ class FormHandler {
      * Bind form events
      */
     bindEvents() {
+        console.log('Binding form events...');
+        
         // Form submission
         this.form.addEventListener('submit', (e) => this.handleSubmit(e));
         
@@ -63,19 +71,28 @@ class FormHandler {
         // Add staff button
         const addStaffBtn = document.getElementById('addStaffBtn');
         if (addStaffBtn) {
+            console.log('Add staff button found, binding click event');
             addStaffBtn.addEventListener('click', () => this.showAddStaffModal());
+        } else {
+            console.error('Add staff button not found!');
         }
         
         // Add staff form
         const addStaffForm = document.getElementById('addStaffForm');
         if (addStaffForm) {
+            console.log('Add staff form found, binding submit event');
             addStaffForm.addEventListener('submit', (e) => this.handleAddStaff(e));
+        } else {
+            console.error('Add staff form not found!');
         }
         
         // Cancel add staff
         const cancelBtn = document.getElementById('cancelAddStaffBtn');
         if (cancelBtn) {
+            console.log('Cancel button found, binding click event');
             cancelBtn.addEventListener('click', () => this.hideAddStaffModal());
+        } else {
+            console.error('Cancel add staff button not found!');
         }
         
         // Auto-save site for next time
@@ -302,10 +319,15 @@ class FormHandler {
      * Load staff options
      */
     loadStaffOptions() {
+        console.log('loadStaffOptions called');
         const staffSelect = document.getElementById('staff');
-        if (!staffSelect) return;
+        if (!staffSelect) {
+            console.log('Staff select element not found');
+            return;
+        }
         
         const staffMembers = this.storageService.getAllStaff();
+        console.log('Loading staff members:', staffMembers);
         
         // Clear existing options (except first)
         while (staffSelect.children.length > 1) {
@@ -314,9 +336,14 @@ class FormHandler {
         
         // Add staff options
         staffMembers.forEach(staff => {
-            const option = createElement('option', { value: staff.name }, staff.name);
+            const option = document.createElement('option');
+            option.value = staff.name;
+            option.textContent = staff.name;
             staffSelect.appendChild(option);
+            console.log('Added staff option:', staff.name);
         });
+        
+        console.log('Staff options loaded, total options:', staffSelect.children.length);
     }
 
     /**
@@ -365,45 +392,71 @@ class FormHandler {
      */
     async handleAddStaff(e) {
         e.preventDefault();
+        console.log('handleAddStaff called');
         
         try {
             const formData = new FormData(e.target);
-            const staffData = {
-                name: formData.get('staffName').trim(),
-                phone: formData.get('staffPhone').trim(),
-                addedAt: new Date().toISOString()
-            };
+            const staffName = formData.get('staffName');
+            const staffPhone = formData.get('staffPhone');
             
-            // Validate
-            if (!staffData.name) {
-                showToast('請輸入姓名', 'error');
+            console.log('Form data:', { staffName, staffPhone });
+            
+            if (!staffName || !staffName.trim()) {
+                console.log('No staff name provided');
+                alert('請輸入姓名');
                 return;
             }
             
+            const staffData = {
+                name: staffName.trim(),
+                phone: staffPhone ? staffPhone.trim() : '',
+                addedAt: new Date().toISOString()
+            };
+            
+            console.log('Staff data to save:', staffData);
+            
             // Check if already exists
             const existingStaff = this.storageService.getAllStaff();
+            console.log('Existing staff:', existingStaff);
+            
             if (existingStaff.some(staff => staff.name === staffData.name)) {
-                showToast('此工務人員已存在', 'error');
+                console.log('Staff already exists');
+                alert('此工務人員已存在');
                 return;
             }
             
             // Save staff
             this.storageService.saveStaff(staffData);
+            console.log('Staff saved successfully');
             
             // Reload staff options
             this.loadStaffOptions();
+            console.log('Staff options reloaded');
             
             // Select the new staff
             const staffSelect = document.getElementById('staff');
             if (staffSelect) {
                 staffSelect.value = staffData.name;
+                console.log('New staff selected in dropdown');
             }
             
-            showToast('工務人員新增成功', 'success');
+            // Show success message
+            if (typeof showToast === 'function') {
+                showToast('工務人員新增成功', 'success');
+            } else {
+                alert('工務人員新增成功');
+            }
+            
             this.hideAddStaffModal();
+            console.log('Modal hidden');
             
         } catch (error) {
-            showToast(`新增工務人員失敗: ${error.message}`, 'error');
+            console.error('Error adding staff:', error);
+            if (typeof showToast === 'function') {
+                showToast(`新增工務人員失敗: ${error.message}`, 'error');
+            } else {
+                alert(`新增工務人員失敗: ${error.message}`);
+            }
         }
     }
 
