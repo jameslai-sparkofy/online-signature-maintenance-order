@@ -1,0 +1,19 @@
+[build]
+  base = "src/main/resources/assets"
+  publish = "src/main/resources/assets"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/signature"
+  to = "/signature.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
